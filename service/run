@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "*** starting dbus-mqtt-meter ***"
+exec 2>&1
+cd /data/dbus-mqtt-meter
+exec env PYTHONPATH=/data/dbus-mqtt-meter/ext/velib_python softlimit -d 100000000 -s 1000000 -a 100000000 /data/dbus-mqtt-meter/dbus-mqtt-meter.py mqtt.kirch.xyz
