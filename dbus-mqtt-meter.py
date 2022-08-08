@@ -105,8 +105,8 @@ class Meter(object):
 
     def update(self, topic, payload):
         try:
-            value = float(payload.decode())
             sensor = topic[:-6]
+            value = float(payload.decode())
             self.data[sensor] = value
 
             if sensor in self.data_map:
@@ -144,6 +144,16 @@ class Meter(object):
                 "KeyError Exception raised. This is normal in the beginning, when not all values have been recieved yet",
                 exc_info=e,
             )
+
+        except ValueError as e:
+            if payload.decode() == "unavailable":
+                logger.warning(
+                    "Unavailable entity found for %s. Skipping.",
+                    sensor,
+                )
+                return
+
+            raise e
 
     def __repr__(self):
         return self.__class__.__name__ + "(" + str(self.cts) + ")"
