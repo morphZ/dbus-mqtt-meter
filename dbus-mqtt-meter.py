@@ -3,14 +3,13 @@
 import argparse
 import logging
 import os
-import sys
 import re
+import sys
+from collections import OrderedDict
 
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop
-from collections import OrderedDict
 from gi.repository import GLib
-
 from vedbus import VeDbusService
 
 from mqtt_gobject_bridge import MqttGObjectBridge
@@ -136,6 +135,12 @@ class Meter(object):
                     * self.data[f"hass/sensor/netz_i{phase_no}"]
                     * self.data[f"hass/sensor/netz_u{phase_no}"]
                 )
+
+                # switch L1 and L3
+                if phase_no == "1":
+                    phase_no = "3"
+                elif phase_no == "3":
+                    phase_no = "1"
 
                 self.set_path(f"/Ac/L{phase_no}/Power", phase_power)
 
