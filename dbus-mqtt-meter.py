@@ -64,9 +64,9 @@ class Meter(object):
         self.data["hass/sensor/netz_einspeisung"] = 0.0
 
         # Add objects required by ve-api
-        service.add_path("/Management/ProcessName", __file__)
-        service.add_path("/Management/ProcessVersion", VERSION)
-        service.add_path("/Management/Connection", host)
+        service.add_path("/Mgmt/ProcessName", __file__)
+        service.add_path("/Mgmt/ProcessVersion", VERSION)
+        service.add_path("/Mgmt/Connection", host)
         service.add_path("/DeviceInstance", instance)
         service.add_path("/ProductId", 0xFFFF)
         service.add_path("/ProductName", "MQTT meter")
@@ -174,6 +174,7 @@ class Bridge(MqttGObjectBridge):
         self.meter = meter
 
     def _on_message(self, client, userdata, msg):
+        logger.debug("Received message on %s: %s", msg.topic, msg.payload)
         self.meter.update(msg.topic, msg.payload)
 
     def _on_connect(self, client, userdata, di, rc):
@@ -181,6 +182,8 @@ class Bridge(MqttGObjectBridge):
             "hass/sensor/netz_bezug",
             "hass/sensor/netz_einspeisung",
         ]
+
+        logger.debug(f"Subscribing to {sensor_list}")
 
         for topic in sensor_list:
             self._client.subscribe(f"{topic}/state", 0)
@@ -191,7 +194,7 @@ def main():
     parser.add_argument(
         "--servicebase",
         help="Base service name on dbus, default is com.victronenergy",
-        default="com.victronenergy.grid",
+        default="com.victronenergy.grid.mqtt",
     )
     parser.add_argument("host", help="MQTT Host")
     args = parser.parse_args()
