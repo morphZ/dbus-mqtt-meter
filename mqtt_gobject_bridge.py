@@ -22,7 +22,7 @@ class MqttGObjectBridge(object):
 		self._mqtt_user = user
 		self._mqtt_passwd = passwd
 		self._mqtt_server = mqtt_server or '127.0.0.1'
-		self._client = paho.mqtt.client.Client(client_id)
+		self._client = paho.mqtt.client.Client(paho.mqtt.client.CallbackAPIVersion.VERSION1, client_id)
 		self._client.on_connect = self._on_connect
 		self._client.on_message = self._on_message
 		self._client.on_disconnect = self._on_disconnect
@@ -68,7 +68,7 @@ class MqttGObjectBridge(object):
 	def _on_socket_timer(self):
 		self._client.loop_misc()
 		while self._client.want_write():
-			if self._client.loop_write(10) != paho.mqtt.client.MQTT_ERR_SUCCESS:
+			if self._client.loop_write() != paho.mqtt.client.MQTT_ERR_SUCCESS:
 				break
 		return True
 
